@@ -1,0 +1,12 @@
+# Virtual Environment ko git se bahar rakhne ke liye
+venv/
+
+# Python ki auto-generated cache files
+__pycache__/
+*.pyc
+
+# Local database file (ye git par push nahi karni hoti)
+db.sqlite3
+
+# User uploaded files (jo assignments/notes aayenge)
+media/
