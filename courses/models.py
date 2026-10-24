@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 import os
 from django.core.exceptions import ValidationError
+from django.utils import timezone
+
 
 # Create your models here.
 
@@ -71,3 +73,8 @@ class StudyMaterial(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.get_material_type_display()}) - {self.subject.code}"
+    
+    
+    
+    
+# Assignment  Model(Faculty)
