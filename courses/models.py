@@ -92,4 +92,21 @@ class Assignment(models.Model):
     
 
 # Submission (Student):
+class Submission(models.Model):
+    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name='submissions')
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='submissions')
+    file = models.FileField(upload_to='submissions/')
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    is_late = models.BooleanField(default=False)
 
+    def save(self, *args, **kwargs):
+        
+        if timezone.now() > self.assignment.deadline:
+            self.is_late = True
+        else:
+            self.is_late = False
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        status = "Late" if self.is_late else "On Time"
+        return f"{self.student.username} - {self.assignment.title} ({status})"
