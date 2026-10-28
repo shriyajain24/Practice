@@ -110,3 +110,9 @@ class Submission(models.Model):
     def __str__(self):
         status = "Late" if self.is_late else "On Time"
         return f"{self.student.username} - {self.assignment.title} ({status})"
+
+
+
+# Online MCQ Quiz :
+# 1. Quiz Model
+
