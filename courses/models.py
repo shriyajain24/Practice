@@ -116,3 +116,7 @@ class Submission(models.Model):
 # Online MCQ Quiz :
 # 1. Quiz Model
 
+class Quiz(models.Model):
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='quizzes')
+    title = models.CharField(max_length=200)
+    created_at = models.DateTimeField(auto_now_add=True)
