@@ -120,3 +120,19 @@ class Quiz(models.Model):
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='quizzes')
     title = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    
+# 2. Question Model
+class Question(models.Model):
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='questions')
+    text = models.TextField()
+    
+    
+# 3. Option Model
+class Option(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='options')
+    text = models.CharField(max_length=200)
+    is_correct = models.BooleanField(default=False)
+    
+    
+# 4. QuizAttempt Model
