@@ -145,3 +145,4 @@ class QuizAttempt(models.Model):
     
     class Meta:
         unique_together = ('student', 'quiz')
+        
