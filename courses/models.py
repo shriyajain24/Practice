@@ -1,37 +1,28 @@
-from django.db import models
-from django.contrib.auth.models import User
+
 import os
+from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from accounts.models import Semester, CustomUser
 
 
-# Create your models here.
-
-
-# Semester
-class Semester(models.Model):
-    number = models.IntegerField(unique=True)
-    name = models.CharField(max_length=50)
-    
-    
-    def __str__(self):
-        return self.name
-
-
-
-# Subject
 class Subject(models.Model):
     name = models.CharField(max_length=150)
     code = models.CharField(max_length=20, unique=True)
     semester = models.ForeignKey(Semester, on_delete=models.CASCADE, related_name='subjects')
-    faculty = models.ForeignKey(User, on_delete=models.CASCADE)
+    faculty = models.ForeignKey(
+        CustomUser,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='teaching_subjects',
+        limit_choices_to={'role': 'Faculty'}
+    )
 
     def __str__(self):
         return f"{self.name} ({self.code})"
 
 
-
-# SyllabusTopic
 class SyllabusTopic(models.Model):
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='topics')
     title = models.CharField(max_length=200)
@@ -39,25 +30,19 @@ class SyllabusTopic(models.Model):
 
     def __str__(self):
         return f"{self.subject.code} - {self.title}"
-    
-    
 
-# Validation of study material 
+
 def validate_study_material_file(file):
-    
     max_size_mb = 10
     if file.size > max_size_mb * 1024 * 1024:
         raise ValidationError(f"File size cannot exceed {max_size_mb}MB.")
-    
-    
+
     ext = os.path.splitext(file.name)[1].lower()
     valid_extensions = ['.pdf', '.ppt', '.pptx', '.doc', '.docx']
     if ext not in valid_extensions:
         raise ValidationError("Only PDF, PPT, and DOC files are allowed.")
-    
-    
-    
-# Study Material (Digital Library)
+
+
 class StudyMaterial(models.Model):
     MATERIAL_TYPES = [
         ('NOTES', 'Notes'),
@@ -73,34 +58,32 @@ class StudyMaterial(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.get_material_type_display()}) - {self.subject.code}"
-    
-    
-    
-    
-# Assignment Model(Faculty)
+
+
 class Assignment(models.Model):
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='assignments')
     title = models.CharField(max_length=200)
     description = models.TextField()
     deadline = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
     def __str__(self):
         return f"{self.title} - {self.subject.code}"
-    
-    
-    
 
-# Submission (Student):
+
 class Submission(models.Model):
     assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name='submissions')
-    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='submissions')
+    student = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name='submissions',
+        limit_choices_to={'role': 'Student'}
+    )
     file = models.FileField(upload_to='submissions/')
     submitted_at = models.DateTimeField(auto_now_add=True)
     is_late = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
-        
         if timezone.now() > self.assignment.deadline:
             self.is_late = True
         else:
@@ -109,40 +92,48 @@ class Submission(models.Model):
 
     def __str__(self):
         status = "Late" if self.is_late else "On Time"
-        return f"{self.student.username} - {self.assignment.title} ({status})"
+        return f"{self.student.uid} - {self.assignment.title} ({status})"
 
-
-
-# Online MCQ Quiz :
-# 1. Quiz Model
 
 class Quiz(models.Model):
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='quizzes')
     title = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True)
-    
-    
-# 2. Question Model
+
+    def __str__(self):
+        return f"{self.title} ({self.subject.code})"
+
+
 class Question(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='questions')
     text = models.TextField()
-    
-    
-# 3. Option Model
+
+    def __str__(self):
+        return f"{self.quiz.title} - {self.text[:40]}"
+
+
 class Option(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='options')
     text = models.CharField(max_length=200)
     is_correct = models.BooleanField(default=False)
-    
-    
-# 4. QuizAttempt Model
+
+    def __str__(self):
+        return self.text
+
+
 class QuizAttempt(models.Model):
-    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='quiz_attempts')
+    student = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name='quiz_attempts',
+        limit_choices_to={'role': 'Student'}
+    )
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='attempts')
     score = models.DecimalField(max_digits=5, decimal_places=2)
     completed_at = models.DateTimeField(auto_now_add=True)
-    
-    
+
     class Meta:
         unique_together = ('student', 'quiz')
-        
+
+    def __str__(self):
+        return f"{self.student.uid} - {self.quiz.title} ({self.score})"
