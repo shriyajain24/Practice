@@ -1,11 +1,14 @@
 from django.contrib import admin
 from .models import (
-    Semester, Subject, SyllabusTopic, 
-    StudyMaterial, Assignment, Submission, 
-    Quiz, Question, Option, QuizAttempt
+    Subject, SyllabusTopic, StudyMaterial, 
+    Assignment, Submission, Quiz, Question, Option, QuizAttempt
 )
+from accounts.models import Department, Program, Semester, CustomUser
 
+admin.site.register(Department)
+admin.site.register(Program)
 admin.site.register(Semester)
+admin.site.register(CustomUser)
 admin.site.register(Subject)
 admin.site.register(SyllabusTopic)
 admin.site.register(StudyMaterial)
