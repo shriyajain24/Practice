@@ -121,7 +121,7 @@ class Option(models.Model):
 
 
 class QuizAttempt(models.Model):
-    student = models.ForeignKey(
+    student = models.ForeignKey (
         CustomUser,
         on_delete=models.CASCADE,
         related_name='quiz_attempts',
