@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ subject.name }} - Vision LMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 min-h-screen font-sans">
+
+    <nav class="bg-indigo-700 text-white px-6 py-4 shadow-md flex justify-between items-center">
+        <a href="{% url 'subject_list' %}" class="text-sm hover:underline">← Back to Courses</a>
+        <span class="font-bold">{{ subject.code }}</span>
+    </nav>
+
+    <div class="max-w-4xl mx-auto p-6 space-y-6">
+        
+        <!-- Subject Header Card -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+            <span class="text-xs font-semibold bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded">{{ subject.code }}</span>
+            <h1 class="text-2xl font-bold text-slate-800 mt-2">{{ subject.name }}</h1>
+            <p class="text-sm text-slate-600 mt-1">
+                Faculty: <strong>{{ subject.faculty.first_name }} {{ subject.faculty.last_name }}</strong> | {{ subject.semester.semester_name }}
+            </p>
+        </div>
+
+        <!-- Study Materials Section -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+            <h2 class="text-lg font-bold text-slate-800 mb-4">📚 Study Materials (Notes / PDFs)</h2>
+            {% if materials %}
+                <ul class="space-y-3">
+                    {% for item in materials %}
+                        <li class="flex justify-between items-center p-3 bg-slate-50 rounded-lg border">
+                            <div>
+                                <p class="font-medium text-slate-800">{{ item.title }}</p>
+                                <p class="text-xs text-slate-500">Uploaded: {{ item.uploaded_at|date:"d M Y" }}</p>
+                            </div>
+                            {% if item.file %}
+                                <a href="{{ item.file.url }}" target="_blank" 
+                                   class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium px-3 py-2 rounded-lg">
+                                    View / Download PDF
+                                </a>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-sm text-slate-500">Is subject ke liye abhi koi study material upload nahi hai.</p>
+            {% endif %}
+        </div>
+
+        <!-- Assignments Section -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+            <h2 class="text-lg font-bold text-slate-800 mb-4">📝 Assignments</h2>
+            {% if assignments %}
+                <div class="space-y-3">
+                    {% for task in assignments %}
+                        <div class="p-4 bg-slate-50 rounded-lg border">
+                            <div class="flex justify-between items-center">
+                                <h3 class="font-semibold text-slate-800">{{ task.title }}</h3>
+                                <span class="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded">
+                                    Due: {{ task.deadline|date:"d M Y, h:i A" }}
+                                </span>
+                            </div>
+                            <p class="text-sm text-slate-600 mt-2">{{ task.description }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-sm text-slate-500">Abhi koi assignment nahi diya gaya hai.</p>
+            {% endif %}
+        </div>
+
+    </div>
+
+</body>
+</html>

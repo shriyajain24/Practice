@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Courses - Vision LMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 min-h-screen font-sans">
+
+    <!-- Navbar -->
+    <nav class="bg-indigo-700 text-white px-6 py-4 shadow-md flex justify-between items-center">
+        <h1 class="text-xl font-bold tracking-wide">Vision College LMS</h1>
+        <span class="text-sm bg-indigo-800 px-3 py-1 rounded-full">Courses Module</span>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-5xl mx-auto p-6">
+        <h2 class="text-2xl font-bold text-slate-800 mb-6">Available Subjects</h2>
+
+        {% if subjects %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for subject in subjects %}
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition">
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="text-xs font-semibold uppercase tracking-wider bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded">
+                                {{ subject.code }}
+                            </span>
+                            <span class="text-xs text-slate-500">
+                                {{ subject.semester.semester_name }}
+                            </span>
+                        </div>
+
+                        <h3 class="text-lg font-bold text-slate-800 mb-2">{{ subject.name }}</h3>
+                        
+                        <p class="text-sm text-slate-600 mb-4">
+                            Faculty: <span class="font-medium text-slate-800">{{ subject.faculty.first_name }} {{ subject.faculty.last_name }}</span>
+                        </p>
+
+                        <a href="{% url 'subject_detail' subject.id %}" 
+                           class="inline-block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition">
+                            Open Course →
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="bg-white p-8 rounded-xl text-center text-slate-500 border">
+                Abhi koi subject add nahi hai. Admin panel se add karein!
+            </div>
+        {% endif %}
+    </div>
+
+</body>
+</html>
