@@ -11,12 +11,10 @@ def subject_detail(request, subject_id):
     subject = get_object_or_404(Subject, id=subject_id)
     materials = subject.materials.all()
     assignments = subject.assignments.all()
-    syllabus = subject.syllabus_topics.all()
     
     context = {
         'subject': subject,
         'materials': materials,
         'assignments': assignments,
-        'syllabus': syllabus,
     }
     return render(request, 'courses/subject_detail.html', context)
